@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>White Matter of the Human Brain</title>
+        <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+                <style>
+                    body {
+                        font-family: Verdana, sans-serif;
+                        font-size: 130%;
+                        background-color: #000;
+                        color: #fff;
+                        margin: 0px;
+                        overflow: hidden;
+                    }
+                #info {
+                    color: #fff;
+                    position: absolute;
+                    top: 10px;
+                    left: 10px;
+                    width: 50%;
+                    text-align: left;
+                    z-index: 100;
+                    display:block;
+                }
+                #info a {
+                    color: #046;
+                    font-weight: bold;
+                }
+
+                #instructions {
+                	color: #fff;
+                    position: absolute;
+                    font-size: 70%;
+                    top: 10px;
+                    left: 10px;
+                    width: 50%;
+                    text-align: left;
+                    z-index: 100;
+                    display:block;
+                }
+                </style>
+                </head>
+    
+    <body>
+        <div id="info">
+            Explore the Grey Matter of the Human Brain
+        </div>
+
+        <div id="instructions">
+        	<p>
+    		<br>
+    		<br>
+    		Interact with the cortical surface of the human brain <br>
+    		 <br>
+    		
+        	 Adjust the sliders to change the transparency<br> 
+        	 levels of each item.</p>
+        	 </div>
+
+        <script src="js/three.js"></script>
+        
+        <script src="js/OrbitControls.js"></script>
+        
+        <script src="js/Detector.js"></script>
+<!-- 
+        <script src="js/Tween.js"></script> -->
+
+        <script src="js/dat.gui.min.js"></script>
+
+        
+        <script>
+            if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+            var container,controls;
+            var camera, scene, renderer, light;
+            var clock = new THREE.Clock();
+
+            // var implode = true;
+            // var explode = false;
+            
+            // tract names
+            //var cfma, cfmi, larc, lcc, lslf;
+            init();
+
+            animate(); 
+            //implode_meshes();
+            //explode_meshes();
+
+            function init() {
+                container = document.createElement( 'div' );
+                document.body.appendChild( container );
+                camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+                //camera.position.set( 300, 100, 100 );
+                camera.position.y = 250;
+                
+                
+                scene = new THREE.Scene();
+                scene.background = new THREE.Color( 0x333333 );
+
+                light = new THREE.AmbientLight( 0xffffff, .6 );
+                light.position.set( -0.66, -32.8, 7.5)
+                scene.add( light );
+                light = new THREE.DirectionalLight( 0xffffff, .6 );
+                light.position.set( -1.85, 10, 7.5 );
+                scene.add( light );
+                light = new THREE.DirectionalLight( 0xffffff, .6 );
+                light.position.set( -.66, -32.8, 7.5 );
+                scene.add( light );
+
+
+                var gui = new dat.GUI({ width: 350 });
+                var f1 = gui.addFolder('Frontal Lobe');
+                var f2 = gui.addFolder('Parietal Lobe');
+                var f3 = gui.addFolder('Occipital Lobe');
+                var f4 = gui.addFolder('Temporal Lobe');
+                var f5 = gui.addFolder('Subcortical');
+
+               
+                var props = {
+                    initialvis: 1,
+                    };
+                // var gui = new dat.GUI({ width: 350 });
+
+                var loader = new THREE.JSONLoader();
+                //load all models here
+
+                loader.load('models/3v.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var v3 = new THREE.Mesh( geometry, material );
+                    scene.add( v3 );
+                    v3.material.transparent = true;
+                    v3.material.opacity = 1;
+
+					loader.load('models/4v.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var v4 = new THREE.Mesh( geometry, material );
+                    scene.add( v4 );
+                    v4.material.transparent = true;
+                    v4.material.opacity = 1;
+
+					loader.load('models/llv.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var llv = new THREE.Mesh( geometry, material );
+                    scene.add( llv );
+                    llv.material.transparent = true;
+                    llv.material.opacity = 1;
+
+                    loader.load('models/rlv.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rlv = new THREE.Mesh( geometry, material );
+                    scene.add( rlv );
+                    rlv.material.transparent = true;
+                    rlv.material.opacity = 1;
+
+                    f5.add(props, 'initialvis', 0, 1).name('Ventricles').onChange(function(opval) {
+                v3.material.opacity = opval;
+                v4.material.opacity = opval;
+                llv.material.opacity = opval;
+                rlv.material.opacity = opval;
+                 if ( opval < .12 ) {
+                    v3.visible = false;
+                    v4.visible = false;
+                    llv.visible = false;
+                    rlv.visible = false;
+                } else { v3.visible = true; 
+                	v4.visible = true;
+                	llv.visible = true;
+                	rlv.visible = true;
+                }
+            });
+                });
+
+				});
+               });
+                //     document.getElementById( "cfmaButtonId" ).addEventListener("click", function(){
+                // cfma.visible = !cfma.visible;
+            //});
+                });
+
+                loader.load('models/bstem.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var bstem = new THREE.Mesh( geometry, material );
+                    scene.add( bstem );
+                    bstem.material.transparent = true;
+                    bstem.material.opacity = 1;
+                    f5.add(props, 'initialvis', 0, 1).name('Brain Stem').onChange(function(opval) {
+                bstem.material.opacity = opval;
+                 if ( opval < .12 ) {
+                    bstem.visible = false;
+                } else { bstem.visible = true; 
+                }
+               });
+                    });
+
+            	loader.load('models/lamygdala.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var lamygdala = new THREE.Mesh( geometry, material );
+                    scene.add( lamygdala );
+                    lamygdala.material.transparent = true;
+                    lamygdala.material.opacity = 1;
+                    
+
+                loader.load('models/ramygdala.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var ramygdala = new THREE.Mesh( geometry, material );
+                    scene.add( ramygdala );
+                    ramygdala.material.transparent = true;
+                    ramygdala.material.opacity = 1;
+
+                    f5.add(props, 'initialvis', 0, 1).name('Amygdala').onChange(function(opval) {
+                lamygdala.material.opacity = opval;
+                ramygdala.material.opacity = opval;
+                 if ( opval < .12 ) {
+                    lamygdala.visible = false;
+                    ramygdala.visible = false;
+                } else { lamygdala.visible = true; 
+                    ramygdala.visible = true;
+                }
+               });
+                
+});
+                });
+
+
+                loader.load('models/lbanks.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var lbanks = new THREE.Mesh( geometry, material );
+                    scene.add( lbanks );
+                    lbanks.material.transparent = true;
+                    lbanks.material.opacity = 1;
+
+                    loader.load('models/rbanks.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rbanks = new THREE.Mesh( geometry, material );
+                    scene.add( rbanks );
+                    rbanks.material.transparent = true;
+                    rbanks.material.opacity = 1;
+
+                
+                    f4.add(props, 'initialvis', 0, 1).name('Banks of the STS').onChange(function(opval) {
+                lbanks.material.opacity = opval;
+                rbanks.material.opacity = opval;
+                  if ( opval < .12 ) {
+                    lbanks.visible = false;
+                    rbanks.visible = false;
+                } else { lbanks.visible = true; 
+                    rbanks.visible = true;
+                }
+
+                });
+               });
+                    
+    
+                });
+
+                loader.load('models/lcaudalantcing.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var lcaudalantcing = new THREE.Mesh( geometry, material );
+                    scene.add( lcaudalantcing );
+                    lcaudalantcing.material.transparent = true;
+                    lcaudalantcing.material.opacity = 1;
+                    
+                    loader.load('models/rcaudalantcing.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rcaudalantcing = new THREE.Mesh( geometry, material );
+                    scene.add( rcaudalantcing );
+                    rcaudalantcing.material.transparent = true;
+                    rcaudalantcing.material.opacity = 1;
+                    f5.add(props, 'initialvis', 0, 1).name('Caudal Anterior Cingulate').onChange(function(opval) {
+                lcaudalantcing.material.opacity = opval;
+                rcaudalantcing.material.opacity = opval;
+                  if ( opval < .12 ) {
+                    lcaudalantcing.visible = false;
+                    rcaudalantcing.visible = false;
+                } else { lcaudalantcing.visible = true; 
+                    rcaudalantcing.visible = true;
+                }
+                });
+                     });
+                     });
+                    
+                    loader.load('models/opticchiasm.json', function (geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var opticchiasm = new THREE.Mesh( geometry, material );
+                    scene.add( opticchiasm );
+                    opticchiasm.material.transparent = true;
+                    opticchiasm.material.opacity = 1;
+                    //lhpial.material.transparent = true;
+                    f5.add(props, 'initialvis', 0, 1).name('Optic Chiasm').onChange(function(opval) {
+                opticchiasm.material.opacity = opval;
+                
+                if ( opval < .1 ) {
+                    opticchiasm.visible = false;
+                    
+                } else { opticchiasm.visible = true; 
+                    
+                }
+                });
+                });
+
+
+
+                loader.load('models/lcaudate.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var lcaudate = new THREE.Mesh( geometry, material );
+                    scene.add( lcaudate );
+                    lcaudate.material.transparent = true;
+                    lcaudate.material.opacity = 1;
+                    
+
+                loader.load('models/rcaudate.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rcaudate = new THREE.Mesh( geometry, material );
+                    scene.add( rcaudate );
+                    rcaudate.material.transparent = true;
+                    rcaudate.material.opacity = 1;
+                    f5.add(props, 'initialvis', 0, 1).name('Caudate').onChange(function(opval) {
+                lcaudate.material.opacity = opval;
+                rcaudate.material.opacity = opval;
+                  if ( opval < .12 ) {
+                    lcaudate.visible = false;
+                    rcaudate.visible = false;
+                } else { lcaudate.visible = true; 
+                    rcaudate.visible = true;
+                }
+                });
+                });
+                });
+
+                loader.load('models/lcaudmidfront.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var lcaudmidfront = new THREE.Mesh( geometry, material );
+                    scene.add( lcaudmidfront );
+                    lcaudmidfront.material.transparent = true;
+                    lcaudmidfront.material.opacity = 1;
+                    
+                    loader.load('models/rcaudmidfront.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rcaudmidfront = new THREE.Mesh( geometry, material );
+                    scene.add( rcaudmidfront );
+                    rcaudmidfront.material.transparent = true;
+                    rcaudmidfront.material.opacity = 1;
+                    f1.add(props, 'initialvis', 0, 1).name('Caudal Middle Frontal').onChange(function(opval) {
+                lcaudmidfront.material.opacity = opval;
+                rcaudmidfront.material.opacity = opval;
+                  if ( opval < .12 ) {
+                    lcaudmidfront.visible = false;
+                    rcaudmidfront.visible = false;
+                } else { lcaudmidfront.visible = true; 
+                    rcaudmidfront.visible = true;
+                }
+                });
+                });
+                    
+                });
+
+                loader.load('models/lcuneus.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var lcuneus = new THREE.Mesh( geometry, material );
+                    scene.add( lcuneus );
+                    lcuneus.material.transparent = true;
+                    lcuneus.material.opacity = 1;
+
+                    loader.load('models/rcuneus.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rcuneus = new THREE.Mesh( geometry, material );
+                    scene.add( rcuneus );
+                    rcuneus.material.transparent = true;
+                    rcuneus.material.opacity = 1;
+
+                    f3.add(props, 'initialvis', 0, 1).name('Cuneaus').onChange(function(opval) {
+                lcuneus.material.opacity = opval;
+                rcuneus.material.opacity = opval;
+                  if ( opval < .12 ) {
+                    lcuneus.visible = false;
+                    rcuneus.visible = false;
+                } else { lcuneus.visible = true; 
+                    rcuneus.visible = true;
+                }
+                });
+                });
+                });
+
+                loader.load('models/lfrontpole.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var lfrontpole = new THREE.Mesh( geometry, material );
+                    scene.add( lfrontpole );
+                    lfrontpole.material.transparent = true;
+                    lfrontpole.material.opacity = 1;
+                    
+                    loader.load('models/rfrontpole.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rfrontpole = new THREE.Mesh( geometry, material );
+                    scene.add( rfrontpole );
+                    rfrontpole.material.transparent = true;
+                    rfrontpole.material.opacity = 1;
+                    f1.add(props, 'initialvis', 0, 1).name('Frontal Pole').onChange(function(opval) {
+                lfrontpole.material.opacity = opval;
+                rfrontpole.material.opacity = opval;
+                  if ( opval < .12) {
+                    lfrontpole.visible = false;
+                    rfrontpole.visible = false;
+                } else { lfrontpole.visible = true; 
+                    rfrontpole.visible = true;
+                }
+                });
+                });
+
+                });
+
+                loader.load('models/lfusiform.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var lfusiform = new THREE.Mesh( geometry, material );
+                    scene.add( lfusiform );
+                    lfusiform.material.transparent = true;
+                    lfusiform.material.opacity = 1;
+
+                    loader.load('models/rfusiform.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rfusiform = new THREE.Mesh( geometry, material );
+                    scene.add( rfusiform );
+                    rfusiform.material.transparent = true;
+                    rfusiform.material.opacity = 1;
+                    f4.add(props, 'initialvis', 0, 1).name('Fusiform Gyrus').onChange(function(opval) {
+                lfusiform.material.opacity = opval;
+                rfusiform.material.opacity = opval;
+                  if ( opval < .12 ) {
+                    lfusiform.visible = false;
+                    rfusiform.visible = false;
+                } else { lfusiform.visible = true; 
+                    rfusiform.visible = true;
+                }
+                });
+
+                });
+                });
+
+                loader.load('models/lhippocampus.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var lhippocampus = new THREE.Mesh( geometry, material );
+                    scene.add( lhippocampus );
+                    lhippocampus.material.transparent = true;
+                    lhippocampus.material.opacity = 1;
+                    
+
+                    loader.load('models/rhippocampus.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rhippocampus = new THREE.Mesh( geometry, material );
+                    scene.add( rhippocampus );
+                    rhippocampus.material.transparent = true;
+                    rhippocampus.material.opacity = 1;
+
+                    f5.add(props, 'initialvis', 0, 1).name('Hippocampus').onChange(function(opval) {
+                lhippocampus.material.opacity = opval;
+                rhippocampus.material.opacity = opval;
+                if ( opval < .12 ) {
+                    lhippocampus.visible = false;
+                    rhippocampus.visible = false;
+                } else { lhippocampus.visible = true; 
+                    rhippocampus.visible = true;
+                }
+                });
+                });
+
+
+                });
+
+                loader.load('models/linfparietal.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var linfparietal = new THREE.Mesh( geometry, material );
+                    scene.add( linfparietal );
+                    linfparietal.material.transparent = true;
+                    linfparietal.material.opacity = 1;
+                    
+                    loader.load('models/rinfparietal.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rinfparietal = new THREE.Mesh( geometry, material );
+                    scene.add( rinfparietal );
+                    rinfparietal.material.transparent = true;
+                    rinfparietal.material.opacity = 1;
+                    f2.add(props, 'initialvis', 0, 1).name('Inferior Parietal Gyrus').onChange(function(opval) {
+                linfparietal.material.opacity = opval;
+                rinfparietal.material.opacity = opval;
+                  if ( opval < .12 ) {
+                    linfparietal.visible = false;
+                    rinfparietal.visible = false;
+                } else { linfparietal.visible = true; 
+                    rinfparietal.visible = true;
+                }
+                });
+                     });
+                     });
+
+                loader.load('models/linftemp.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var linftemp = new THREE.Mesh( geometry, material );
+                    scene.add( linftemp );
+                    linftemp.material.transparent = true;
+                    linftemp.material.opacity = 1;
+                    
+                    loader.load('models/rinftemp.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rinftemp = new THREE.Mesh( geometry, material );
+                    scene.add( rinftemp );
+                    rinftemp.material.transparent = true;
+                    rinftemp.material.opacity = 1;
+                    f4.add(props, 'initialvis', 0, 1).name('Inferior Temporal Gyrus').onChange(function(opval) {
+                linftemp.material.opacity = opval;
+                rinftemp.material.opacity = opval;
+                  if ( opval < .12 ) {
+                    linftemp.visible = false;
+                    rinftemp.visible = false;
+                } else { linftemp.visible = true; 
+                    rinftemp.visible = true;
+                }
+                });
+                     });
+                     });
+
+                loader.load('models/linsula.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var linsula = new THREE.Mesh( geometry, material );
+                    scene.add( linsula );
+                    linsula.material.transparent = true;
+                    linsula.material.opacity = 1;
+                    
+                    loader.load('models/rinsula.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rinsula = new THREE.Mesh( geometry, material );
+                    scene.add( rinsula );
+                    rinsula.material.transparent = true;
+                    rinsula.material.opacity = 1;
+                    f5.add(props, 'initialvis', 0, 1).name('Insula').onChange(function(opval) {
+                linsula.material.opacity = opval;
+                rinsula.material.opacity = opval;
+                  if ( opval < .12 ) {
+                    linsula.visible = false;
+                    rinsula.visible = false;
+                } else { linsula.visible = true; 
+                    rinsula.visible = true;
+                }
+                });
+                     });
+                     });
+
+                loader.load('models/llatocc.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var llatocc = new THREE.Mesh( geometry, material );
+                    scene.add( llatocc );
+                    llatocc.material.transparent = true;
+                    llatocc.material.opacity = 1;
+                    
+                    loader.load('models/rlatocc.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rlatocc = new THREE.Mesh( geometry, material );
+                    scene.add( rlatocc );
+                    rlatocc.material.transparent = true;
+                    rlatocc.material.opacity = 1;
+                    f3.add(props, 'initialvis', 0, 1).name('Lateral Occipital Gyrus').onChange(function(opval) {
+                llatocc.material.opacity = opval;
+                rlatocc.material.opacity = opval;
+                  if ( opval < .12 ) {
+                    llatocc.visible = false;
+                    rlatocc.visible = false;
+                } else { llatocc.visible = true; 
+                    rlatocc.visible = true;
+                }
+                });
+                     });
+                     });
+
+
+					loader.load('models/llatorbfront.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var llatorbfront = new THREE.Mesh( geometry, material );
+                    scene.add( llatorbfront );
+                    llatorbfront.material.transparent = true;
+                    llatorbfront.material.opacity = 1;
+                    
+                    loader.load('models/rlatorbfront.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rlatorbfront = new THREE.Mesh( geometry, material );
+                    scene.add( rlatorbfront );
+                    rlatorbfront.material.transparent = true;
+                    rlatorbfront.material.opacity = 1;
+                    f1.add(props, 'initialvis', 0, 1).name('Lateral Oribital Frontal Gyrus').onChange(function(opval) {
+                llatorbfront.material.opacity = opval;
+                rlatorbfront.material.opacity = opval;
+                  if ( opval < .12 ) {
+                    llatorbfront.visible = false;
+                    rlatorbfront.visible = false;
+                } else { llatorbfront.visible = true; 
+                    rlatorbfront.visible = true;
+                }
+                });
+                     });
+                     });
+               
+					loader.load('models/llingual.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var llingual = new THREE.Mesh( geometry, material );
+                    scene.add( llingual );
+                    llingual.material.transparent = true;
+                    llingual.material.opacity = 1;
+                    
+                    loader.load('models/rlingual.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rlingual = new THREE.Mesh( geometry, material );
+                    scene.add( rlingual );
+                    rlingual.material.transparent = true;
+                    rlingual.material.opacity = 1;
+                    f3.add(props, 'initialvis', 0, 1).name('Lingual Gyrus').onChange(function(opval) {
+                llingual.material.opacity = opval;
+                rlingual.material.opacity = opval;
+                  if ( opval < .12 ) {
+                    llingual.visible = false;
+                    rlingual.visible = false;
+                } else { llingual.visible = true; 
+                    rlingual.visible = true;
+                }
+                });
+                     });
+                     });
+
+					loader.load('models/lmidtemp.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var lmidtemp = new THREE.Mesh( geometry, material );
+                    scene.add( lmidtemp );
+                    lmidtemp.material.transparent = true;
+                    lmidtemp.material.opacity = 1;
+                    
+                    loader.load('models/rmidtemp.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rmidtemp = new THREE.Mesh( geometry, material );
+                    scene.add( rmidtemp );
+                    rmidtemp.material.transparent = true;
+                    rmidtemp.material.opacity = 1;
+                    f4.add(props, 'initialvis', 0, 1).name('Middle Temporal Gyrus').onChange(function(opval) {
+                lmidtemp.material.opacity = opval;
+                rmidtemp.material.opacity = opval;
+                  if ( opval < .12 ) {
+                    lmidtemp.visible = false;
+                    rmidtemp.visible = false;
+                } else { lmidtemp.visible = true; 
+                    rmidtemp.visible = true;
+                }
+                });
+                     });
+                     });
+
+					loader.load('models/lpallidum.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var lpallidum = new THREE.Mesh( geometry, material );
+                    scene.add( lpallidum );
+                    lpallidum.material.transparent = true;
+                    lpallidum.material.opacity = 1;
+                    
+                    loader.load('models/rpallidum.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rpallidum = new THREE.Mesh( geometry, material );
+                    scene.add( rpallidum );
+                    rpallidum.material.transparent = true;
+                    rpallidum.material.opacity = 1;
+                    f5.add(props, 'initialvis', 0, 1).name('Pallidum').onChange(function(opval) {
+                lpallidum.material.opacity = opval;
+                rpallidum.material.opacity = opval;
+                  if ( opval < .12 ) {
+                    lpallidum.visible = false;
+                    rpallidum.visible = false;
+                } else { lpallidum.visible = true; 
+                    rpallidum.visible = true;
+                }
+                });
+                     });
+                     });
+
+					loader.load('models/lparacent.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var lparacent = new THREE.Mesh( geometry, material );
+                    scene.add( lparacent );
+                    lparacent.material.transparent = true;
+                    lparacent.material.opacity = 1;
+                    
+                    loader.load('models/rparacent.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rparacent = new THREE.Mesh( geometry, material );
+                    scene.add( rparacent );
+                    rparacent.material.transparent = true;
+                    rparacent.material.opacity = 1;
+                    f2.add(props, 'initialvis', 0, 1).name('Paracentral Gyrus').onChange(function(opval) {
+                lparacent.material.opacity = opval;
+                rparacent.material.opacity = opval;
+                  if ( opval < .12 ) {
+                    lparacent.visible = false;
+                    rparacent.visible = false;
+                } else { lparacent.visible = true; 
+                    rparacent.visible = true;
+                }
+                });
+                     });
+                     });
+
+					loader.load('models/lparahip.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var lparahip = new THREE.Mesh( geometry, material );
+                    scene.add( lparahip );
+                    lparahip.material.transparent = true;
+                    lparahip.material.opacity = 1;
+                    
+                    loader.load('models/rparahip.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rparahip = new THREE.Mesh( geometry, material );
+                    scene.add( rparahip );
+                    rparahip.material.transparent = true;
+                    rparahip.material.opacity = 1;
+                    f4.add(props, 'initialvis', 0, 1).name('Parahippocampal Gyrus').onChange(function(opval) {
+                lparahip.material.opacity = opval;
+                rparahip.material.opacity = opval;
+                  if ( opval < .12 ) {
+                    lparahip.visible = false;
+                    rparahip.visible = false;
+                } else { lparahip.visible = true; 
+                    rparahip.visible = true;
+                }
+                });
+                     });
+                     });
+					
+
+					loader.load('models/lparoperc.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var lparoperc = new THREE.Mesh( geometry, material );
+                    scene.add( lparoperc );
+                    lparoperc.material.transparent = true;
+                    lparoperc.material.opacity = 1;
+                    
+                    loader.load('models/rparoperc.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rparoperc = new THREE.Mesh( geometry, material );
+                    scene.add( rparoperc );
+                    rparoperc.material.transparent = true;
+                    rparoperc.material.opacity = 1;
+                    f1.add(props, 'initialvis', 0, 1).name('Pars Opercularis').onChange(function(opval) {
+                lparoperc.material.opacity = opval;
+                rparoperc.material.opacity = opval;
+                  if ( opval < .12 ) {
+                    lparoperc.visible = false;
+                    rparoperc.visible = false;
+                } else { lparoperc.visible = true; 
+                    rparoperc.visible = true;
+                }
+                });
+                     });
+                     });
+
+					loader.load('models/lparsorb.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var lparsorb = new THREE.Mesh( geometry, material );
+                    scene.add( lparsorb );
+                    lparsorb.material.transparent = true;
+                    lparsorb.material.opacity = 1;
+                    
+                    loader.load('models/rparsorb.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rparsorb = new THREE.Mesh( geometry, material );
+                    scene.add( rparsorb );
+                    rparsorb.material.transparent = true;
+                    rparsorb.material.opacity = 1;
+                    f1.add(props, 'initialvis', 0, 1).name('Pars Orbitalis').onChange(function(opval) {
+                lparsorb.material.opacity = opval;
+                rparsorb.material.opacity = opval;
+                  if ( opval < .12 ) {
+                    lparsorb.visible = false;
+                    rparsorb.visible = false;
+                } else { lparsorb.visible = true; 
+                    rparsorb.visible = true;
+                }
+                });
+                     });
+                     });
+					loader.load('models/lparstri.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var lparstri = new THREE.Mesh( geometry, material );
+                    scene.add( lparstri );
+                    lparstri.material.transparent = true;
+                    lparstri.material.opacity = 1;
+                    
+                    loader.load('models/rparstri.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rparstri = new THREE.Mesh( geometry, material );
+                    scene.add( rparstri );
+                    rparstri.material.transparent = true;
+                    rparstri.material.opacity = 1;
+                    f1.add(props, 'initialvis', 0, 1).name('Pars Triangularis').onChange(function(opval) {
+                lparstri.material.opacity = opval;
+                rparstri.material.opacity = opval;
+                  if ( opval < .12 ) {
+                    lparstri.visible = false;
+                    rparstri.visible = false;
+                } else { lparstri.visible = true; 
+                    rparstri.visible = true;
+                }
+                });
+                     });
+                     });
+					
+					loader.load('models/lperical.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var lperical = new THREE.Mesh( geometry, material );
+                    scene.add( lperical );
+                    lperical.material.transparent = true;
+                    lperical.material.opacity = 1;
+                    
+                    loader.load('models/rperical.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rperical = new THREE.Mesh( geometry, material );
+                    scene.add( rperical );
+                    rperical.material.transparent = true;
+                    rperical.material.opacity = 1;
+                    f3.add(props, 'initialvis', 0, 1).name('Pericalcarine').onChange(function(opval) {
+                lperical.material.opacity = opval;
+                rperical.material.opacity = opval;
+                  if ( opval < .12 ) {
+                    lperical.visible = false;
+                    rperical.visible = false;
+                } else { lperical.visible = true; 
+                    rperical.visible = true;
+                }
+                });
+                     });
+                     });
+
+					loader.load('models/lpostcent.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var lpostcent = new THREE.Mesh( geometry, material );
+                    scene.add( lpostcent );
+                    lpostcent.material.transparent = true;
+                    lpostcent.material.opacity = 1;
+                    
+                    loader.load('models/rpostcent.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rpostcent = new THREE.Mesh( geometry, material );
+                    scene.add( rpostcent );
+                    rpostcent.material.transparent = true;
+                    rpostcent.material.opacity = 1;
+                    f2.add(props, 'initialvis', 0, 1).name('Postcentral Gyrus').onChange(function(opval) {
+                lpostcent.material.opacity = opval;
+                rpostcent.material.opacity = opval;
+                  if ( opval < .12 ) {
+                    lpostcent.visible = false;
+                    rpostcent.visible = false;
+                } else { lpostcent.visible = true; 
+                    rpostcent.visible = true;
+                }
+                });
+                     });
+                     });
+					loader.load('models/lpostcing.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var lpostcing = new THREE.Mesh( geometry, material );
+                    scene.add( lpostcing );
+                    lpostcing.material.transparent = true;
+                    lpostcing.material.opacity = 1;
+                    
+                    loader.load('models/rpostcing.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rpostcing = new THREE.Mesh( geometry, material );
+                    scene.add( rpostcing );
+                    rpostcing.material.transparent = true;
+                    rpostcing.material.opacity = 1;
+                    f5.add(props, 'initialvis', 0, 1).name('Posterior Cingulate Gyrus').onChange(function(opval) {
+                lpostcing.material.opacity = opval;
+                rpostcing.material.opacity = opval;
+                  if ( opval < .12 ) {
+                    lpostcing.visible = false;
+                    rpostcing.visible = false;
+                } else { lpostcing.visible = true; 
+                    rpostcing.visible = true;
+                }
+                });
+                     });
+                     });
+					
+					loader.load('models/lprecent.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var lprecent = new THREE.Mesh( geometry, material );
+                    scene.add( lprecent );
+                    lprecent.material.transparent = true;
+                    lprecent.material.opacity = 1;
+                    
+                    loader.load('models/rprecent.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rprecent = new THREE.Mesh( geometry, material );
+                    scene.add( rprecent );
+                    rprecent.material.transparent = true;
+                    rprecent.material.opacity = 1;
+                    f1.add(props, 'initialvis', 0, 1).name('Precentral Gyrus').onChange(function(opval) {
+                lprecent.material.opacity = opval;
+                rprecent.material.opacity = opval;
+                  if ( opval < .12 ) {
+                    lprecent.visible = false;
+                    rprecent.visible = false;
+                } else { lprecent.visible = true; 
+                    rprecent.visible = true;
+                }
+                });
+                     });
+                     });
+
+					loader.load('models/lprecuneus.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var lprecuneus = new THREE.Mesh( geometry, material );
+                    scene.add( lprecuneus );
+                    lprecuneus.material.transparent = true;
+                    lprecuneus.material.opacity = 1;
+                    
+                    loader.load('models/rprecuneus.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rprecuneus = new THREE.Mesh( geometry, material );
+                    scene.add( rprecuneus );
+                    rprecuneus.material.transparent = true;
+                    rprecuneus.material.opacity = 1;
+                    f2.add(props, 'initialvis', 0, 1).name('Precuneus').onChange(function(opval) {
+                lprecuneus.material.opacity = opval;
+                rprecuneus.material.opacity = opval;
+                  if ( opval < .12 ) {
+                    lprecuneus.visible = false;
+                    rprecuneus.visible = false;
+                } else { lprecuneus.visible = true; 
+                    rprecuneus.visible = true;
+                }
+                });
+                     });
+                     });
+
+					loader.load('models/lputamen.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var lputamen = new THREE.Mesh( geometry, material );
+                    scene.add( lputamen );
+                    lputamen.material.transparent = true;
+                    lputamen.material.opacity = 1;
+                    
+                    loader.load('models/rputamen.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rputamen = new THREE.Mesh( geometry, material );
+                    scene.add( rputamen );
+                    rputamen.material.transparent = true;
+                    rputamen.material.opacity = 1;
+                    f5.add(props, 'initialvis', 0, 1).name('Putamen').onChange(function(opval) {
+                lputamen.material.opacity = opval;
+                rputamen.material.opacity = opval;
+                  if ( opval < .12 ) {
+                    lputamen.visible = false;
+                    rputamen.visible = false;
+                } else { lputamen.visible = true; 
+                    rputamen.visible = true;
+                }
+                });
+                     });
+                     });
+
+					loader.load('models/lrostantcing.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var lrostantcing = new THREE.Mesh( geometry, material );
+                    scene.add( lrostantcing );
+                    lrostantcing.material.transparent = true;
+                    lrostantcing.material.opacity = 1;
+                    
+                    loader.load('models/rrostantcing.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rrostantcing = new THREE.Mesh( geometry, material );
+                    scene.add( rrostantcing );
+                    rrostantcing.material.transparent = true;
+                    rrostantcing.material.opacity = 1;
+                    f5.add(props, 'initialvis', 0, 1).name('Rostral Anterior Cingulate').onChange(function(opval) {
+                lrostantcing.material.opacity = opval;
+                rrostantcing.material.opacity = opval;
+                  if ( opval < .12 ) {
+                    lrostantcing.visible = false;
+                    rrostantcing.visible = false;
+                } else { lrostantcing.visible = true; 
+                    rrostantcing.visible = true;
+                }
+                });
+                     });
+                     });
+
+					loader.load('models/lrostmidfront.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var lrostmidfront = new THREE.Mesh( geometry, material );
+                    scene.add( lrostmidfront );
+                    lrostmidfront.material.transparent = true;
+                    lrostmidfront.material.opacity = 1;
+                    
+                    loader.load('models/rrostmidfront.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rrostmidfront = new THREE.Mesh( geometry, material );
+                    scene.add( rrostmidfront );
+                    rrostmidfront.material.transparent = true;
+                    rrostmidfront.material.opacity = 1;
+                    f1.add(props, 'initialvis', 0, 1).name('Rostral Middle Frontal Gyrus').onChange(function(opval) {
+                lrostmidfront.material.opacity = opval;
+                rrostmidfront.material.opacity = opval;
+                  if ( opval < .12 ) {
+                    lrostmidfront.visible = false;
+                    rrostmidfront.visible = false;
+                } else { lrostmidfront.visible = true; 
+                    rrostmidfront.visible = true;
+                }
+                });
+                     });
+                     });
+
+					loader.load('models/lsupfront.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var lsupfront = new THREE.Mesh( geometry, material );
+                    scene.add( lsupfront );
+                    lsupfront.material.transparent = true;
+                    lsupfront.material.opacity = 1;
+                    
+                    loader.load('models/rsupfront.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rsupfront = new THREE.Mesh( geometry, material );
+                    scene.add( rsupfront );
+                    rsupfront.material.transparent = true;
+                    rsupfront.material.opacity = 1;
+                    f1.add(props, 'initialvis', 0, 1).name('Superior Frontal Gyrus').onChange(function(opval) {
+                lsupfront.material.opacity = opval;
+                rsupfront.material.opacity = opval;
+                  if ( opval < .12 ) {
+                    lsupfront.visible = false;
+                    rsupfront.visible = false;
+                } else { lsupfront.visible = true; 
+                    rsupfront.visible = true;
+                }
+                });
+                     });
+                     });
+
+					loader.load('models/lsupmarg.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var lsupmarg = new THREE.Mesh( geometry, material );
+                    scene.add( lsupmarg );
+                    lsupmarg.material.transparent = true;
+                    lsupmarg.material.opacity = 1;
+                    
+                    loader.load('models/rsupmarg.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rsupmarg = new THREE.Mesh( geometry, material );
+                    scene.add( rsupmarg );
+                    rsupmarg.material.transparent = true;
+                    rsupmarg.material.opacity = 1;
+                    f2.add(props, 'initialvis', 0, 1).name('Supramarginal Gyrus').onChange(function(opval) {
+                lsupmarg.material.opacity = opval;
+                rsupmarg.material.opacity = opval;
+                  if ( opval < .12 ) {
+                    lsupmarg.visible = false;
+                    rsupmarg.visible = false;
+                } else { lsupmarg.visible = true; 
+                    rsupmarg.visible = true;
+                }
+                });
+                     });
+                     });
+
+					loader.load('models/lsuppar.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var lsuppar = new THREE.Mesh( geometry, material );
+                    scene.add( lsuppar );
+                    lsuppar.material.transparent = true;
+                    lsuppar.material.opacity = 1;
+                    
+                    loader.load('models/rsuppar.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rsuppar = new THREE.Mesh( geometry, material );
+                    scene.add( rsuppar );
+                    rsuppar.material.transparent = true;
+                    rsuppar.material.opacity = 1;
+                    f2.add(props, 'initialvis', 0, 1).name('Superior Parietal Gyrus').onChange(function(opval) {
+                lsuppar.material.opacity = opval;
+                rsuppar.material.opacity = opval;
+                  if ( opval < .12 ) {
+                    lsuppar.visible = false;
+                    rsuppar.visible = false;
+                } else { lsuppar.visible = true; 
+                    rsuppar.visible = true;
+                }
+                });
+                     });
+                     });
+
+					loader.load('models/lsuptemp.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var lsuptemp = new THREE.Mesh( geometry, material );
+                    scene.add( lsuptemp );
+                    lsuptemp.material.transparent = true;
+                    lsuptemp.material.opacity = 1;
+                    
+                    loader.load('models/rsuptemp.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rsuptemp = new THREE.Mesh( geometry, material );
+                    scene.add( rsuptemp );
+                    rsuptemp.material.transparent = true;
+                    rsuptemp.material.opacity = 1;
+                    f4.add(props, 'initialvis', 0, 1).name('Superior Temporal Gyrus').onChange(function(opval) {
+                lsuptemp.material.opacity = opval;
+                rsuptemp.material.opacity = opval;
+                  if ( opval < .12 ) {
+                    lsuptemp.visible = false;
+                    rsuptemp.visible = false;
+                } else { lsuptemp.visible = true; 
+                    rsuptemp.visible = true;
+                }
+                });
+                     });
+                     });
+
+					loader.load('models/ltemppole.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var ltemppole = new THREE.Mesh( geometry, material );
+                    scene.add( ltemppole );
+                    ltemppole.material.transparent = true;
+                    ltemppole.material.opacity = 1;
+                    
+                    loader.load('models/rtemppole.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rtemppole = new THREE.Mesh( geometry, material );
+                    scene.add( rtemppole );
+                    rtemppole.material.transparent = true;
+                    rtemppole.material.opacity = 1;
+                    f4.add(props, 'initialvis', 0, 1).name('Temporal Pole').onChange(function(opval) {
+                ltemppole.material.opacity = opval;
+                rtemppole.material.opacity = opval;
+                  if ( opval < .12 ) {
+                    ltemppole.visible = false;
+                    rtemppole.visible = false;
+                } else { ltemppole.visible = true; 
+                    rtemppole.visible = true;
+                }
+                });
+                     });
+                     });
+
+					loader.load('models/lthalprop.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var lthalprop = new THREE.Mesh( geometry, material );
+                    scene.add( lthalprop );
+                    lthalprop.material.transparent = true;
+                    lthalprop.material.opacity = 1;
+                    
+                    loader.load('models/rthalprop.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rthalprop = new THREE.Mesh( geometry, material );
+                    scene.add( rthalprop );
+                    rthalprop.material.transparent = true;
+                    rthalprop.material.opacity = 1;
+                    f5.add(props, 'initialvis', 0, 1).name('Thalamus').onChange(function(opval) {
+                lthalprop.material.opacity = opval;
+                rthalprop.material.opacity = opval;
+                  if ( opval < .12 ) {
+                    lthalprop.visible = false;
+                    rthalprop.visible = false;
+                } else { lthalprop.visible = true; 
+                    rthalprop.visible = true;
+                }
+                });
+                     });
+                     });
+
+					loader.load('models/ltranstemp.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var ltranstemp = new THREE.Mesh( geometry, material );
+                    scene.add( ltranstemp );
+                    ltranstemp.material.transparent = true;
+                    ltranstemp.material.opacity = 1;
+                    
+                    loader.load('models/rtranstemp.json', function( geometry, materials ) {
+
+                    var material = new THREE.MeshLambertMaterial(materials[ 0 ]);
+                    var rtranstemp = new THREE.Mesh( geometry, material );
+                    scene.add( rtranstemp );
+                    rtranstemp.material.transparent = true;
+                    rtranstemp.material.opacity = 1;
+                    f4.add(props, 'initialvis', 0, 1).name('Transverse Temporal Gyrus').onChange(function(opval) {
+                ltranstemp.material.opacity = opval;
+                rtranstemp.material.opacity = opval;
+                  if ( opval < .12 ) {
+                    ltranstemp.visible = false;
+                    rtranstemp.visible = false;
+                } else { ltranstemp.visible = true; 
+                    rtranstemp.visible = true;
+                }
+                });
+                     });
+                     });
+
+                renderer = new THREE.WebGLRenderer();
+                renderer.setPixelRatio( window.devicePixelRatio );
+                renderer.setSize( window.innerWidth, window.innerHeight );
+                renderer.shadowMap.enabled = true;
+                //renderer.sortObjects = false;
+                container.appendChild( renderer.domElement );
+                window.addEventListener( 'resize', onWindowResize, false );
+                
+                controls = new THREE.OrbitControls( camera, renderer.domElement);
+                controls.target.set( 0, 0, 0 );
+                controls.update();
+
+            
+            }
+
+            function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize( window.innerWidth, window.innerHeight );
+            }
+
+            function render() {
+                renderer.render( scene, camera );
+            }
+
+            function animate() {
+                requestAnimationFrame( animate );
+                
+                render();
+
+                // if ( implode ) {
+                //     TweenIn.update();
+                // }
+
+                // if ( explode ) {
+                //     TweenOut.update();
+                // }
+                
+            }
+
+            // function tweenSetUp() {
+            //     //tween outs
+            //     var cfma_epos = { x: 0, y: -142, z: 0 };
+            //     //var 
+
+            //     var TweenOut = new TWEEN.Group();
+
+            //     var cfma_tweenout = new TWEEN.Tween(cfma.position, TweenOut)
+            //         .to(cfma_epos, 500);
+
+            //     // var cfmi_tweenout = new TWEEN.Tween(cfmi.position, TweenOut).to(cfmi_epos, 500);
+            //     // var larc_tweenout = new TWEEN.Tween(larc.position, TweenOut).to(larc_epos, 500);
+            //     // var lcc_tweenout = new TWEEN.Tween(lcc.position, TweenOut).to(lcc_epos, 500);
+            //     // var lch_tweenout = new TWEEN.Tween(lch.position, TweenOut).to(lch_epos, 500);
+            //     // var lslf_tweenout = new TWEEN.Tween(lslf.position, TweenOut).to(lslf_epos, 500);
+            //     // var lifof_tweenout = new TWEEN.Tween(lifof.position, TweenOut).to(lifof_epos, 500);
+            //     // var lilf_tweenout = new TWEEN.Tween(lilf.position, TweenOut).to(lilf_epos, 500);
+            //     // var ltr_tweenout = new TWEEN.Tween(ltr.position, TweenOut).to(ltr_epos, 500);
+            //     // var lu_tweenout = new TWEEN.Tween(lu.position, TweenOut).to(lu_epos, 500);
+            //     // var rarc_tweenout = new TWEEN.Tween(rarc.position, TweenOut).to(rarc_epos, 500);
+            //     // var rcc_tweenout = new TWEEN.Tween(rcc.position, TweenOut).to(rcc_epos, 500);
+            //     // var rch_tweenout = new TWEEN.Tween(rch.position, TweenOut).to(rch_epos, 500);
+            //     // var rslf_tweenout = new TWEEN.Tween(rslf.position, TweenOut).to(rslf_epos, 500);
+            //     // var rifof_tweenout = new TWEEN.Tween(rifof.position, TweenOut).to(rifof_epos, 500);
+            //     // var rilf_tweenout = new TWEEN.Tween(rilf.position, TweenOut).to(rilf_epos, 500);
+            //     // var rtr_tweenout = new TWEEN.Tween(rtr.position, TweenOut).to(rtr_epos, 500);
+            //     // var ru_tweenout = new TWEEN.Tween(ru.position, TweenOut).to(ru_epos, 500);
+
+            //     //tween ins
+            //     // var opos = { x: 0, y: 0, z: 0 }
+            //     // var TweenIn = new TWEEN.Group();
+            //     // var cfma_tweenin = new TWEEN.Tween(cfma.position, TweenIn)
+            //     //     .to(opos, 500);
+            //     // var cfmi_tweenin = new TWEEN.Tween(cfmi.position, TweenIn)
+            //     //     .to(opos, 500);
+            //     // var larc_tweenin = new TWEEN.Tween(larc.position, TweenIn)
+            //     //     .to(opos, 500);
+            //     // var lcc_tweenin = new TWEEN.Tween(lcc.position, TweenIn)
+            //     //     .to(opos, 500);
+            //     // var lch_tweenin = new TWEEN.Tween(lch.position, TweenIn)
+            //     //     .to(opos, 500);
+            //     // var lslf_tweenin = new TWEEN.Tween(lslf.position, TweenIn)
+            //     //     .to(opos, 500);
+            //     // var lifof_tweenin = new TWEEN.Tween(lifof.position, TweenIn)
+            //     //     .to(opos, 500);
+            //     // var lilf_tweenin = new TWEEN.Tween(lilf.position, TweenIn)
+            //     //     .to(opos, 500);
+            //     // var ltr_tweenin = new TWEEN.Tween(ltr.position, TweenIn)
+            //     //     .to(opos, 500);
+            //     // var lu_tweenin = new TWEEN.Tween(lu.position, TweenIn)
+            //     //     .to(opos, 500);
+            //     // var rarc_tweenin = new TWEEN.Tween(rarc.position, TweenIn)
+            //     //     .to(opos, 500);
+            //     // var rcc_tweenin = new TWEEN.Tween(rcc.position, TweenIn)
+            //     //     .to(opos, 500);
+            //     // var rch_tweenin = new TWEEN.Tween(rch.position, TweenIn)
+            //     //     .to(opos, 500);
+            //     // var rslf_tweenin = new TWEEN.Tween(rslf.position, TweenIn)
+            //     //     .to(opos, 500);
+            //     // var rifof_tweenin = new TWEEN.Tween(rifof.position, TweenIn)
+            //     //     .to(opos, 500);
+            //     // var rilf_tweenin = new TWEEN.Tween(rilf.position, TweenIn)
+            //     //     .to(opos, 500);
+            //     // var rtr_tweenin = new TWEEN.Tween(rtr.position, TweenIn)
+            //     //     .to(opos, 500);
+            //     // var ru_tweenin = new TWEEN.Tween(ru.position, TweenIn)
+            //     //     .to(opos, 500);
+            // }
+            
+            // // function implode_meshes() {
+            
+            // // implode = true;
+            // // explode = false;
+
+            // // cfma_tweenin.start();
+            // // cfmi_tweenin.start();
+            // // larc_tweenin.start();
+            // // lcc_tweenin.start();
+            // // lch_tweenin.start();
+            // // lslf_tweenin.start();
+            // // lifof_tweenin.start();
+            // // lilf_tweenin.start();
+            // // ltr_tweenin.start();
+            // // lu_tweenin.start();
+            // // rarc_tweenin.start();
+            // // rcc_tweenin.start();
+            // // rch_tweenin.start();
+            // // rslf_tweenin.start();
+            // // rifof_tweenin.start();
+            // // rilf_tweenin.start();
+            // // rtr_tweenin.start();
+            // // ru_tweenin.start();
+            // // }
+
+            // explodeButton.onclick = function explode_meshes() {
+            
+            // implode = false;
+            // explode = true;
+
+            // cfma_tweenout.start();
+
+            // }
+            
+
+            
+         
+
+
+            </script>
+        
+    </body>
+</html>
